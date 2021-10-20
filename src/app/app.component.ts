@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Web3Service } from './core/web3.service';
+import { Web3Service } from './core/services/web3.service';
 
 @Component({
   selector: 'app-root',
@@ -8,15 +8,21 @@ import { Web3Service } from './core/web3.service';
 })
 export class AppComponent implements OnInit {
 
-  title = 'dapp-template';
-  metamaskInstalled$ = this.web3Svc.metamaskInstalled$;
+  metamaskInstalled$ = this.web3Svc._metamaskInstalled$;
+  connectedAccount$ = this.web3Svc._connectedAccount$;
 
   constructor(
-    private web3Svc: Web3Service
+    private web3Svc: Web3Service,
   ) { }
 
   async ngOnInit(): Promise<void> {
+    this.connectedAccount$.subscribe(console.log);
+
     await this.web3Svc.loadWeb3();
+    this.web3Svc.test();
   }
 
+  test(): void {
+    console.log('test');
+  }
 }

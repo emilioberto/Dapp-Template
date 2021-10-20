@@ -1,1 +1,5 @@
-Metamask Installed {{ metamaskInstalled$ | async }}
+<div>Metamask Installed {{ metamaskInstalled$ | async }}</div>
+<div>Is connected {{ !!(connectedAccount$ | async) }}</div>
+<div>Connected account {{ connectedAccount$ | async }}</div>
+
+<button (click)="test()">Button</button>
