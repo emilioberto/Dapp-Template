@@ -17,7 +17,9 @@ export class Web3Service {
     if (typeof window.web3 !== 'undefined') {
       window.web3 = new Web3(window.web3.currentProvider);
       this._metamaskInstalled$.next(true);
-      return await (window as any).ethereum.enable();
+      console.log(await window.ethereum.request({ method: 'eth_requestAccounts' }));
+
+      // Handle user reject!
     } else {
       this._metamaskInstalled$.next(false);
     }
