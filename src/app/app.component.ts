@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { EthService } from 'src/app/core/services/eth.service';
 import { Web3Service } from './core/services/web3.service';
 
 @Component({
@@ -9,16 +10,23 @@ import { Web3Service } from './core/services/web3.service';
 })
 export class AppComponent implements OnInit {
 
-  metamaskInstalled$ = this.web3Svc._metamaskInstalled$;
-  connectedAccount$ = this.web3Svc._connectedAccount$;
-  chain$ = this.web3Svc._chain$;
+  metamaskInstalled$ = this.ethSvc.metamaskInstalled$;
+  connectedAccount$ = this.ethSvc.connectedAccount$;
+  chain$ = this.ethSvc.chain$;
 
   constructor(
     private web3Svc: Web3Service,
+    private ethSvc: EthService,
   ) { }
 
   async ngOnInit(): Promise<void> {
     await this.web3Svc.loadWeb3();
+    this.ethSvc.monitorAccountChanged();
+    this.ethSvc.monitorChainChanged();
+
+    this.ethSvc.onConnect(console.log);
+    this.ethSvc.onDisconnect(console.log);
+
   }
 
 }
