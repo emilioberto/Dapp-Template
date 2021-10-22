@@ -10,8 +10,7 @@ import { AppComponent } from './app.component';
     BrowserModule
   ],
   providers: [
-    // { provide: WEB3, useFactory: () => window.web3 },
-    // { provide: ETH, useFactory: () => window.web3.eth },
+
   ],
   bootstrap: [AppComponent]
 })

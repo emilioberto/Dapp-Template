@@ -1,5 +1,4 @@
 <div>Metamask Installed {{ metamaskInstalled$ | async }}</div>
 <div>Is connected {{ !!(connectedAccount$ | async) }}</div>
 <div>Connected account {{ connectedAccount$ | async }}</div>
-
-<button (click)="test()">Button</button>
+<div>Current chain {{ chain$ | async }}</div>

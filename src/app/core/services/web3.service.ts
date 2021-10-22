@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import Web3 from 'web3';
 
-const { web3, ethereum } = window;
+const { ethereum } = window;
 
 @Injectable({
   providedIn: 'root'
@@ -10,9 +10,15 @@ const { web3, ethereum } = window;
 export class Web3Service {
 
   _metamaskInstalled$ = new BehaviorSubject<boolean>(false);
+  _chain$ = new BehaviorSubject<number | null>(null);
   _connectedAccount$ = new BehaviorSubject<string[] | null>(null);
 
-  constructor() { }
+  constructor(
+    private ngZone: NgZone
+  ) {
+    this.registerOnAccountsChangedEvent();
+    this.registerChainChangedEvent();
+  }
 
   async loadWeb3(): Promise<boolean> {
     if (window.ethereum) {
@@ -32,10 +38,18 @@ export class Web3Service {
     return false;
   }
 
-  test(): void {
+  private registerOnAccountsChangedEvent(): void {
     ethereum.on('accountsChanged', (accounts) => {
-      this._connectedAccount$.next(accounts as string[]);
+      this.ngZone.run(() => this._connectedAccount$.next(accounts as string[]));
     });
   }
 
+  private registerChainChangedEvent(): void {
+    ethereum.on('chainChanged', chainId => {
+      if (isNaN(chainId as number)) {
+        throw new Error();
+      }
+      this.ngZone.run(() => this._chain$.next(chainId as number));
+    });
+  }
 }
