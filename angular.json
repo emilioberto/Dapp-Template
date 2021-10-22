@@ -1,5 +1,12 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "schematics": {
+    "@schematics/angular": {
+      "component": {
+        "changeDetection": "OnPush"
+      }
+    }
+  },
   "cli": {
     "analytics": "98ead837-afbc-434d-971b-2b4cb02141ce",
     "defaultCollection": "@angular-eslint/schematics"
