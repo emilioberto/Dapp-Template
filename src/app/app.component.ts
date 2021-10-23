@@ -27,6 +27,8 @@ export class AppComponent implements OnInit {
     this.ethSvc.onConnect(console.log);
     this.ethSvc.onDisconnect(console.log);
 
+    const isConnected = this.ethSvc.isConnected();
+
   }
 
 }

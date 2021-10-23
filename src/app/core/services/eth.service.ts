@@ -2,12 +2,9 @@ import {
   Injectable, NgZone,
 } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { ConnectInfo, ProviderMessage, ProviderRpcError, RequestArguments } from 'src/app/shared/models/ethereum/ethereum.models';
 
 const { ethereum } = window;
-
-export interface ConnectInfo {
-  chainId: string;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -27,21 +24,38 @@ export class EthService {
     private ngZone: NgZone,
   ) { }
 
-  onConnect(handler: (connectInfo: ConnectInfo) => void) {
+  isConnected(): boolean {
+    return ethereum.isConnected();
+  }
+
+  // Ethereum Events
+
+  onConnect(handler: (connectInfo: ConnectInfo) => void): void {
     this.registerEvent('connect', handler);
   }
 
-  onDisconnect(handler: (error: any) => void) { // TODO: Type ProviderRpcError
+  onDisconnect(handler: (error: ProviderRpcError) => void): void {
     this.registerEvent('connect', handler);
   }
 
-  onAccountsChanged(handler: (accounts: string[]) => void) {
+  onAccountsChanged(handler: (accounts: string[]) => void): void {
     this.registerEvent('accountsChanged', handler);
   }
 
-  onChainChanged(handler: (chainId: number) => void) {
+  onChainChanged(handler: (chainId: number) => void): void {
     this.registerEvent('chainChanged', handler);
   }
+
+  onMessage(handler: (message: ProviderMessage) => void): void {
+    this.registerEvent('message', handler);
+  }
+
+  // Ethereum methods
+
+  request(args: RequestArguments): Promise<unknown> {
+    return ethereum.request(args);
+  }
+
 
   monitorAccountChanged(): void {
     this.registerEvent(
