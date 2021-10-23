@@ -2,3 +2,16 @@
 <div>Is connected {{ !!(connectedAccount$ | async) }}</div>
 <div>Connected account {{ connectedAccount$ | async }}</div>
 <div>Current chain {{ chain$ | async }}</div>
+
+<div>///////////////////////////////////////////////////////////////</div>
+<div>///////////////////////////////////////////////////////////////</div>
+<div>///////////////////////////////////////////////////////////////</div>
+
+<div>
+  <span> Value currently stored is: {{ storedValue }} </span>
+  <button (click)="readValue()">Read value</button>
+</div>
+
+<input #valueInput type="number" />
+
+<button (click)="writeValue(+valueInput.value)">Write value</button>

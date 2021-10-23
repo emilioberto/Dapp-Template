@@ -1,5 +1,4 @@
 import { Injectable, NgZone } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import Web3 from 'web3';
 
 @Injectable({
@@ -9,8 +8,7 @@ export class Web3Service {
 
   constructor(
     private ngZone: NgZone
-  ) {
-  }
+  ) { }
 
   async loadWeb3(): Promise<boolean> {
     if (window.ethereum) {

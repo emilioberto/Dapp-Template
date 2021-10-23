@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { switchMap } from 'rxjs/operators';
 import { EthService } from 'src/app/core/services/eth.service';
+import { StorageContractService } from './core/services/storage-contract.service';
 import { Web3Service } from './core/services/web3.service';
 
 @Component({
@@ -14,9 +16,13 @@ export class AppComponent implements OnInit {
   connectedAccount$ = this.ethSvc.connectedAccount$;
   chain$ = this.ethSvc.chain$;
 
+  storedValue!: number;
+
   constructor(
     private web3Svc: Web3Service,
     private ethSvc: EthService,
+    private storageContractSvc: StorageContractService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -28,7 +34,28 @@ export class AppComponent implements OnInit {
     this.ethSvc.onDisconnect(console.log);
 
     const isConnected = this.ethSvc.isConnected();
+    // this.ethSvc.gasPrice().subscribe(console.log);
+    // this.ethSvc.requestAccounts().subscribe(console.log);
+    // this.ethSvc.accounts().subscribe(console.log);
+    // this.ethSvc.accounts()
+    //   .pipe(
+    //     switchMap(accounts => this.ethSvc.getBalance(accounts[0]))
+    //   )
+    //   .subscribe(console.log);
 
+    await this.storageContractSvc.createContract();
+  }
+
+  async readValue(): Promise<void> {
+    const result = await this.storageContractSvc.readStoredValue();
+    this.storedValue = +result;
+    this.cdr.detectChanges();
+  }
+
+  async writeValue(value: number): Promise<void> {
+    const result = await this.storageContractSvc.writeValue(value);
+    console.log(result);
+    await this.readValue();
   }
 
 }
