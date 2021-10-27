@@ -3,8 +3,8 @@ import { BaseContract } from 'src/app/contracts/types';
 
 import Abi from '../../contracts/storage.abi.json';
 import { Storage as StorageContract } from '../../contracts/storage';
-import { AbiItem } from 'web3-utils';
-import { TransactionReceipt } from 'web3-core';
+import { Web3Service } from './web3.service';
+import { ethers, Contract } from 'ethers';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ import { TransactionReceipt } from 'web3-core';
 export class StorageContractService {
 
   private contractAddress = '0xB80da2017366B5Bc8b378ab73E15fB1809682c42';
-  private contract!: StorageContract;
+  private contract!: Contract;
 
   constructor() { }
 
@@ -21,18 +21,18 @@ export class StorageContractService {
       return;
     }
 
-    this.contract = new window.web3.eth.Contract(Abi as AbiItem[], this.contractAddress) as BaseContract as StorageContract;
+    this.contract = new Contract(this.contractAddress, Abi);
   }
 
   readStoredValue(): Promise<string> {
-    return this.contract.methods.retrieve().call();
+    return this.contract.retrieve();
   }
 
-  async writeValue(value: number): Promise<TransactionReceipt> {
-    const [account] = await window.web3.eth.getAccounts();
-    const gasPrice = await window.web3.eth.getGasPrice();
+  async writeValue(value: number): Promise<any> { // TODO: Type TransactionReceipt
+    const [account] = await Web3Service.provider.listAccounts();
+    const gasPrice = await Web3Service.provider.getGasPrice();
 
-    return await this.contract.methods.store(value).send({ from: account, gasPrice });
+    return await this.contract.store(value).send({ from: account, gasPrice });
   }
 
 
