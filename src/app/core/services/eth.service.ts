@@ -1,14 +1,13 @@
 import {
   Injectable, NgZone,
 } from '@angular/core';
+import { BigNumber } from 'ethers';
 import { BehaviorSubject, from, Observable } from 'rxjs';
 
-import { map, take, tap } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 
-import { ConnectInfo, ProviderMessage, ProviderRpcError, RequestArguments } from 'src/app/shared/models/ethereum/ethereum.models';
-import Web3 from 'web3';
-
-const { ethereum } = window;
+import { ConnectInfo, ProviderMessage, ProviderRpcError } from 'src/app/shared/models/ethereum/ethereum.models';
+import { Web3Service } from './web3.service';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +28,7 @@ export class EthService {
   ) { }
 
   isConnected(): boolean {
-    return ethereum.isConnected();
+    return window.ethereum.isConnected();
   }
 
   // Ethereum Events
@@ -56,30 +55,26 @@ export class EthService {
 
   // Ethereum methods
 
-  request(args: RequestArguments): Observable<unknown> {
-    return from(ethereum.request(args))
+  request(method: string, params: any[] = []): Observable<unknown> {
+    return from(Web3Service.provider.prepareRequest(method, params))
       .pipe(take(1));
   }
 
-  gasPrice(params: unknown[] = []): Observable<any> {
-    const args: RequestArguments = { method: 'eth_gasPrice', params };
-    return (this.request(args) as Observable<number>)
-      .pipe(map(Web3.utils.toNumber));
+  gasPrice(params: any[] = []): Observable<any> {
+    return (this.request('eth_gasPrice', params) as Observable<BigNumber>)
+      .pipe(map(gasPrice => gasPrice.toNumber()));
   }
 
   requestAccounts(): Observable<string[]> {
-    const args: RequestArguments = { method: 'eth_requestAccounts' };
-    return (this.request(args) as Observable<string[]>);
+    return (this.request('eth_requestAccounts') as Observable<string[]>);
   }
 
   accounts(): Observable<string[]> {
-    const args: RequestArguments = { method: 'eth_accounts' };
-    return (this.request(args) as Observable<string[]>);
+    return (this.request('eth_accounts') as Observable<string[]>);
   }
 
   getBalance(account: string): Observable<number> {
-    const args: RequestArguments = { method: 'eth_getBalance', params: [account] };
-    return (this.request(args) as Observable<number>);
+    return (this.request('eth_getBalance', [account]) as Observable<number>);
   }
 
   monitorAccountChanged(): void {
@@ -104,6 +99,6 @@ export class EthService {
   // Utils
 
   private registerEvent(eventName: string, handler: (...args: any) => void): void {
-    ethereum.on(eventName, handler);
+    Web3Service.provider.on(eventName, handler);
   }
 }

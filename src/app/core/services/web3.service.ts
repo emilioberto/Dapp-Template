@@ -1,30 +1,26 @@
-import { Injectable, NgZone } from '@angular/core';
-import Web3 from 'web3';
+import { Injectable } from '@angular/core';
+import { ExternalProvider, Web3Provider } from '@ethersproject/providers';
+import { ethers } from "ethers";
 
 @Injectable({
   providedIn: 'root'
 })
 export class Web3Service {
 
-  constructor(
-    private ngZone: NgZone
-  ) { }
+  public static provider: Web3Provider;
 
-  async loadWeb3(): Promise<boolean> {
+  constructor() { }
+
+  static async loadWeb3(): Promise<boolean> {
     if (window.ethereum) {
       try {
-        const accounts = await (window.ethereum.request({ method: 'eth_requestAccounts' }) as Promise<string[]>);
-        // this._metamaskInstalled$.next(true);
-        // this._connectedAccount$.next(accounts);
-        window.web3 = new Web3(window.ethereum as any);
+        await (window.ethereum.request!({ method: 'eth_requestAccounts' }) as Promise<string[]>);
+        this.provider = new ethers.providers.Web3Provider(window.ethereum as unknown as ExternalProvider)
         return true;
       } catch (error) {
-        // this._metamaskInstalled$.next(false);
         return false;
       }
     }
-
-    // this._metamaskInstalled$.next(false);
     return false;
   }
 

@@ -19,14 +19,13 @@ export class AppComponent implements OnInit {
   storedValue!: number;
 
   constructor(
-    private web3Svc: Web3Service,
     private ethSvc: EthService,
     private storageContractSvc: StorageContractService,
     private cdr: ChangeDetectorRef
   ) { }
 
   async ngOnInit(): Promise<void> {
-    await this.web3Svc.loadWeb3();
+    await Web3Service.loadWeb3();
     this.ethSvc.monitorAccountChanged();
     this.ethSvc.monitorChainChanged();
 
