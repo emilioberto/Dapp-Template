@@ -1,7 +1,8 @@
-<div>Metamask Installed {{ metamaskInstalled$ | async }}</div>
 <div>Is connected {{ !!(connectedAccount$ | async) }}</div>
+<br />
 <div>Connected account {{ connectedAccount$ | async }}</div>
-<div>Current chain {{ chain$ | async }}</div>
+<br />
+<div>Current chain {{ network | json }}</div>
 
 <div>///////////////////////////////////////////////////////////////</div>
 <div>///////////////////////////////////////////////////////////////</div>
@@ -9,9 +10,12 @@
 
 <div>
   <span> Value currently stored is: {{ storedValue }} </span>
+  <br />
   <button (click)="readValue()">Read value</button>
 </div>
-
+<br />
+<span>New value</span>
+<br />
 <input #valueInput type="number" />
-
+<br />
 <button (click)="writeValue(+valueInput.value)">Write value</button>

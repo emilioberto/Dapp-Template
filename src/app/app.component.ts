@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { EthService } from 'src/app/core/services/eth.service';
 import { StorageContractService } from './core/services/storage-contract.service';
 import { Web3Service } from './core/services/web3.service';
+import { Network } from '@ethersproject/networks';
 
 @Component({
   selector: 'app-root',
@@ -11,10 +12,9 @@ import { Web3Service } from './core/services/web3.service';
 })
 export class AppComponent implements OnInit {
 
-  metamaskInstalled$ = this.ethSvc.metamaskInstalled$;
   connectedAccount$ = this.ethSvc.connectedAccount$;
-  chain$ = this.ethSvc.chain$;
 
+  network!: Network;
   storedValue!: number;
 
   constructor(
@@ -25,21 +25,13 @@ export class AppComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await Web3Service.loadWeb3();
+
+    this.network = await this.ethSvc.getNetwork();
+    await this.ethSvc.getAccounts();
+    this.cdr.detectChanges();
+
     this.ethSvc.monitorAccountChanged();
-    this.ethSvc.monitorChainChanged();
-
-    this.ethSvc.onConnect(console.log);
-    this.ethSvc.onDisconnect(console.log);
-
-    const isConnected = this.ethSvc.isConnected();
-    // this.ethSvc.gasPrice().subscribe(console.log);
-    // this.ethSvc.requestAccounts().subscribe(console.log);
-    // this.ethSvc.accounts().subscribe(console.log);
-    // this.ethSvc.accounts()
-    //   .pipe(
-    //     switchMap(accounts => this.ethSvc.getBalance(accounts[0]))
-    //   )
-    //   .subscribe(console.log);
+    this.ethSvc.monitorNetworkChanged();
 
     await this.storageContractSvc.createContract();
   }

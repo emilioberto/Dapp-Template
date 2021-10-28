@@ -2,25 +2,26 @@ import {
   Injectable, NgZone,
 } from '@angular/core';
 import { BigNumber } from 'ethers';
+import { Network } from '@ethersproject/networks';
 import { BehaviorSubject, from, Observable } from 'rxjs';
 
 import { map, take } from 'rxjs/operators';
 
 import { ConnectInfo, ProviderMessage, ProviderRpcError } from 'src/app/shared/models/ethereum/ethereum.models';
 import { Web3Service } from './web3.service';
+import { ethers } from "ethers";
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class EthService {
 
-  private _metamaskInstalled$ = new BehaviorSubject<boolean>(false);
-  private _chain$ = new BehaviorSubject<number | null>(null);
+  private _network$ = new BehaviorSubject<number | null>(null);
   private _connectedAccount$ = new BehaviorSubject<string[] | null>(null);
 
   // Observables
-  metamaskInstalled$ = this._metamaskInstalled$.asObservable();
-  chain$ = this._chain$.asObservable();
+  network$ = this._network$.asObservable();
   connectedAccount$ = this._connectedAccount$.asObservable();
 
   constructor(
@@ -29,6 +30,16 @@ export class EthService {
 
   isConnected(): boolean {
     return window.ethereum.isConnected();
+  }
+
+  getNetwork(): Promise<Network> {
+    return Web3Service.provider.getNetwork();
+  }
+
+  async getAccounts(): Promise<string[]> {
+    const accounts = await Web3Service.provider.listAccounts();
+    this._connectedAccount$.next(accounts);
+    return accounts;
   }
 
   // Ethereum Events
@@ -80,25 +91,29 @@ export class EthService {
   monitorAccountChanged(): void {
     this.registerEvent(
       'accountsChanged',
-      (accounts: string[]) => this._connectedAccount$.next(accounts)
+      (accounts: string[]) => {
+        console.log(accounts);
+        this._connectedAccount$.next(accounts);
+      }
     );
   }
 
-  monitorChainChanged(): void {
-    this.registerEvent(
-      'chainChanged',
-      chainId => {
-        if (isNaN(chainId as number)) {
-          throw new Error();
-        }
-        this.ngZone.run(() => this._chain$.next(chainId as number));
+  monitorNetworkChanged(): void {
+    const provider = new ethers.providers.Web3Provider(window.ethereum as any, "any");
+    provider.on("network", (newNetwork, oldNetwork) => {
+      // When a Provider makes its initial connection, it emits a "network"
+      // event with a null oldNetwork along with the newNetwork. So, if the
+      // oldNetwork exists, it represents a changing network
+      if (oldNetwork) {
+        alert('network changed');
+        window.location.reload();
       }
-    );
+    });
   }
 
   // Utils
 
   private registerEvent(eventName: string, handler: (...args: any) => void): void {
-    Web3Service.provider.on(eventName, handler);
+    window.ethereum.on(eventName, handler);
   }
 }
