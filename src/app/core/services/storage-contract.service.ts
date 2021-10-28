@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BaseContract } from 'src/app/contracts/types';
+import { StorageAbi } from 'src/app/contracts/types';
 
 import Abi from '../../contracts/storage.abi.json';
-import { Storage as StorageContract } from '../../contracts/storage';
 import { Web3Service } from './web3.service';
-import { ethers, Contract } from 'ethers';
+import { Contract, BigNumber, ContractTransaction } from 'ethers';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +11,7 @@ import { ethers, Contract } from 'ethers';
 export class StorageContractService {
 
   private contractAddress = '0xB80da2017366B5Bc8b378ab73E15fB1809682c42';
-  private contract!: Contract;
+  private contract!: StorageAbi;
 
   constructor() { }
 
@@ -20,22 +19,19 @@ export class StorageContractService {
     if (this.contract !== null && this.contract !== undefined) {
       return;
     }
-
-    this.contract = new Contract(this.contractAddress, Abi);
+    const signer = Web3Service.provider.getSigner(0);
+    this.contract = new Contract(this.contractAddress, Abi, signer) as StorageAbi;
   }
 
-  readStoredValue(): Promise<string> {
+  readStoredValue(): Promise<BigNumber> {
     return this.contract.retrieve();
   }
 
-  async writeValue(value: number): Promise<any> { // TODO: Type TransactionReceipt
+  async writeValue(value: number): Promise<ContractTransaction> {
     const [account] = await Web3Service.provider.listAccounts();
     const gasPrice = await Web3Service.provider.getGasPrice();
 
-    return await this.contract.store(value).send({ from: account, gasPrice });
+    return await this.contract.store(value, { from: account, gasPrice });
   }
-
-
-
 
 }

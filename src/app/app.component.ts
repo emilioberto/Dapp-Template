@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { switchMap } from 'rxjs/operators';
 import { EthService } from 'src/app/core/services/eth.service';
 import { StorageContractService } from './core/services/storage-contract.service';
 import { Web3Service } from './core/services/web3.service';

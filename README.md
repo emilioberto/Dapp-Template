@@ -24,5 +24,5 @@ https://stackoverflow.com/questions/66749738/angular-web3-js-module-not-found-er
 To create types for Contract:
 
 ```
-npx typechain --out-dir src/app/contracts --target web3-v1 
+npx typechain --target ethers-v5 --out-dir src/app/contracts/types "src/app/contracts/**/*.json"
 ```
