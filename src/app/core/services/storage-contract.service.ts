@@ -24,6 +24,7 @@ export class StorageContractService {
   }
 
   readStoredValue(): Promise<BigNumber> {
+    this.contract.callStatic.retrieve
     return this.contract.retrieve();
   }
 

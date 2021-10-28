@@ -51,8 +51,9 @@ export class AppComponent implements OnInit {
   }
 
   async writeValue(value: number): Promise<void> {
-    const result = await this.storageContractSvc.writeValue(value);
-    console.log(result);
+    const transaction = await this.storageContractSvc.writeValue(value);
+    const receipt = await transaction.wait();
+    console.log(receipt);
     await this.readValue();
   }
 
