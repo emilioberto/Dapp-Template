@@ -3,6 +3,7 @@ import { EthService } from 'src/app/core/services/eth.service';
 import { StorageContractService } from './core/services/storage-contract.service';
 import { Web3Service } from './core/services/web3.service';
 import { Network } from '@ethersproject/networks';
+import { StorageV2ContractService } from './core/services/storage-v2-contract.service';
 
 @Component({
   selector: 'app-root',
@@ -19,7 +20,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private ethSvc: EthService,
-    private storageContractSvc: StorageContractService,
+    private storageContractSvc: StorageV2ContractService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -34,6 +35,7 @@ export class AppComponent implements OnInit {
     this.ethSvc.monitorNetworkChanged();
 
     await this.storageContractSvc.createContract();
+    this.storageContractSvc.monitorValueStoredChanged();
   }
 
   async readValue(): Promise<void> {
